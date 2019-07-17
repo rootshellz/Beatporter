@@ -4,6 +4,8 @@ This tool scrapes Beatport Top 100 charts, by genre, and attempts to locate the 
 
 For each genre, a new playlist will be created based on the Beatport charts.  Not all tracks from the chart will be available on Spotify and some tracks may be different mixes (if the exact mix is not available).
 
+There is also support for the overall, genre-agnostic, Top 100 chart.
+
 If a playlist already exists for a given genre being synced, any new tracks from the genre's Beatport chart will be added to the playlist. 
 
 ## Prerequisites
@@ -28,9 +30,9 @@ pip install spotipy
     * `redirect_uri` this is the local listener that is used to intercept the Spotify authentication callback.
         * As described above, the `redirect_uri` needs to be registered verbatim on the [Spotify Developer](https://developer.spotify.com) site.  Go to the app's dashboard and click _Edit Settings_.  Then under _Redirect URIs_ paste the value of `redirect_uri` and click _add_.  Finally, scroll to the bottom of the _Edit Settings_ window and click _Save_.
     * `genres` is a dictionary that maps genre names (which are arbitrary and will be used in playlist names) to Beatport URL components.
-        * The presence of a genre in the dictionary toggles it on (its absense toggles it off)
+        * The presence of a genre in the dictionary toggles it on (its absence toggles it off)
             * Simply comment out (or remove) the line for a genre to stop it from syncing  
-        * The URL component comes from the way Beatport structures tehir genre chart URLs.
+        * The URL component comes from the way Beatport structures their genre chart URLs.
             * For example, the Top 100 chart for Trance is at the URL https://www.beatport.com/genre/trance/7/top-100, so the URL component in the dictionary is `trance/7`
         * All known genres and their URL component mapping are included in the example config for easy reference.
             * If you know of other (hidden) genre URLs, please share in an issue or PR.
@@ -38,8 +40,10 @@ pip install spotipy
 ## Authentication
 This application will never see your Spotify credentials.  Instead upon successful authentication and approval,  Spotify will provide this application with an API token that can be used to read and modify your library and playlists.
 
-### Initial Authentication & Application Appoval
+### Initial Authentication & Application Approval
 The first time you run the application your web browser should open to the Spotify authentication page.  Upon successful authentication, you will be prompted to approve this application with the permission scope defined in the `config.scope` variable.  If approved, Spotify will "callback" to the application and provide the necessary API tokens.
+
+After authenticating, your browser may display something like "This page isn’t working localhost didn’t send any data."  This is okay, simply close the window and you should see the application working.
 
 ### Token Refresh
 The API token provided by Spotify is short lived, however, a refresh token is aso provided during authentication.  This refresh token can be used to retrieve a new API token (and a new refresh token) in the future.  These tokens are persisted to disk at `token.json` and `.cache-USERNAME`.
@@ -60,10 +64,11 @@ This project was born out of a personal desire for this functionality.  As such,
 
 * Implement other charts as sources for playlists
     * Top 10 Genre (higher quality than Top 100)
-    * Top 100 overall
 * Support playlists that track only the current chart status
     * Instead of adding new tracks to an ever growing playlist, the playlists would exactly match the most current chart and have a song cap (e.g. 100 songs on a Top 100 playlist)
     * This will provide shorter, but more current playlists
+ * Implement a real HTTP listener that can return an actual HTTP response with a pretty HTML page.
+    * Currently a hacky TCP socket listener is used.  It's not pretty, but it works.
  * Cleanup token caching
     * Use only `.cache-USERNAME` instead of `token.json`
     * Add option to auto delete on completion
