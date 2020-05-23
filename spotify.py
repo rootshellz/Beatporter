@@ -230,6 +230,6 @@ def add_new_tracks_to_playlist(genre, tracks_dict):
 
 
 # Get authenticated to Spotify on import
-sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, scope=scope)
+sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, username=username, scope=scope)
 token_info = do_spotify_oauth()
 spotify = spotipy.Spotify(auth=token_info["access_token"])
