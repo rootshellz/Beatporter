@@ -195,14 +195,7 @@ def search_for_track(track):
 
 
 def track_in_playlist(playlist_id, track_id):
-    playlist_tracks_results = spotify.user_playlist(username, playlist_id, fields="tracks")
-    playlist_tracks_pager = playlist_tracks_results["tracks"]
-    playlist_tracks = playlist_tracks_pager["items"]
-    while playlist_tracks_pager["next"]:
-        playlist_tracks_pager = spotify.next(playlist_tracks_pager)
-        playlist_tracks.extend(playlist_tracks_pager["items"])
-
-    for track in playlist_tracks:
+    for track in get_all_tracks_in_playlist(playlist_id):
         if track["track"]["id"] == track_id:
             return True
     return False
@@ -213,20 +206,51 @@ def add_tracks_to_playlist(playlist_id, track_ids):
         spotify.user_playlist_add_tracks(username, playlist_id, track_ids)
 
 
+def get_all_tracks_in_playlist(playlist_id):
+    playlist_tracks_results = spotify.user_playlist(username, playlist_id, fields="tracks")
+    playlist_tracks_pager = playlist_tracks_results["tracks"]
+    playlist_tracks = playlist_tracks_pager["items"]
+    while playlist_tracks_pager["next"]:
+        playlist_tracks_pager = spotify.next(playlist_tracks_pager)
+        playlist_tracks.extend(playlist_tracks_pager["items"])
+    return playlist_tracks
+
+
+def clear_playlist(playlist_id):
+    for track in get_all_tracks_in_playlist(playlist_id):
+        spotify.user_playlist_remove_all_occurrences_of_tracks(username, playlist_id, [track["track"]["id"],])
+
+
 def add_new_tracks_to_playlist(genre, tracks_dict):
-    playlist_name = "Beatporter: {} - Top 100".format(genre)
-    print("[+] Identifying new tracks for playlist: \"{}\"".format(playlist_name))
-    playlist_id = get_playlist_id(playlist_name)
-    if not playlist_id:
-        print("\t[!] Playlist does not exist, creating it.")
-        playlist_id = create_playlist(playlist_name)
-    track_ids = list()
+    persistent_top_100_playlist_name = "Beatporter: {} - Top 100".format(genre)
+    daily_top_10_playlist_name = "Beatporter: {} - Daily Top 10".format(genre)
+    print("[+] Identifying new tracks for playlist: \"{}\"".format(persistent_top_100_playlist_name))
+
+    playlists = [{"name": persistent_top_100_playlist_name, "id": get_playlist_id(persistent_top_100_playlist_name)},
+                 {"name": daily_top_10_playlist_name, "id": get_playlist_id(daily_top_10_playlist_name)}]
+
+    for playlist in playlists:
+        if not playlist["id"]:
+            print("\t[!] Playlist \"{}\" does not exist, creating it.".format(playlist["name"]))
+            playlist["id"] = create_playlist(playlist["name"])
+
+    # Clear daily playlist
+    clear_playlist(playlists[1]["id"])
+
+    persistent_top_100_track_ids = list()
+    daily_top_10_track_ids = list()
+    track_count = 0
     for track in tracks_dict:
         track_id = search_for_track(track)
-        if track_id and not track_in_playlist(playlist_id, track_id):
-            track_ids.append(track_id)
-    print("\n[+] Adding {} new tracks to the playlist: \"{}\"".format(len(track_ids), playlist_name))
-    add_tracks_to_playlist(playlist_id, track_ids)
+        if track_id and not track_in_playlist(playlists[0]["id"], track_id):
+            persistent_top_100_track_ids.append(track_id)
+        if track_id and track_count < 10:
+            daily_top_10_track_ids.append(track_id)
+        track_count += 1
+    print("\n[+] Adding {} new tracks to the playlist: \"{}\"".format(len(persistent_top_100_track_ids), persistent_top_100_playlist_name))
+    add_tracks_to_playlist(playlists[0]["id"], persistent_top_100_track_ids)
+    print("\n[+] Adding {} new tracks to the playlist: \"{}\"".format(len(daily_top_10_track_ids), daily_top_10_playlist_name))
+    add_tracks_to_playlist(playlists[1]["id"], daily_top_10_track_ids)
 
 
 # Get authenticated to Spotify on import
