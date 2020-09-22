@@ -19,7 +19,7 @@ genres = {
     "Big Room": "big-room/79",
     "Breaks": "breaks/9",
     "DJ Tools": "dj-tools/16",
-    "Dance": "dance/39",
+    "Dance / Electro Pop": "dance-electro-pop/39",
     "Deep House": "deep-house/12",
     "Drum & Bass": "drum-and-bass/1",
     "Dubstep": "dubstep/18",
