@@ -110,3 +110,6 @@ venv.bak/
 .cache*
 config.py
 token.json
+/Pipfile
+/Pipfile.lock
+/.vscode
