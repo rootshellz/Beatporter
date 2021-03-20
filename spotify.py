@@ -207,7 +207,7 @@ def add_tracks_to_playlist(playlist_id, track_ids):
 
 
 def get_all_tracks_in_playlist(playlist_id):
-    playlist_tracks_results = spotify.user_playlist(username, playlist_id, fields="tracks")
+    playlist_tracks_results = spotify.playlist(playlist_id, fields="tracks")
     playlist_tracks_pager = playlist_tracks_results["tracks"]
     playlist_tracks = playlist_tracks_pager["items"]
     while playlist_tracks_pager["next"]:
