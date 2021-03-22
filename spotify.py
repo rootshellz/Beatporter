@@ -207,13 +207,16 @@ def add_tracks_to_playlist(playlist_id, track_ids):
 
 
 def get_all_tracks_in_playlist(playlist_id):
+    if playlist_track_cache[playlist_id]:
+        return playlist_track_cache[playlist_id]
     playlist_tracks_results = spotify.playlist(playlist_id, fields="tracks")
     playlist_tracks_pager = playlist_tracks_results["tracks"]
     playlist_tracks = playlist_tracks_pager["items"]
     while playlist_tracks_pager["next"]:
         playlist_tracks_pager = spotify.next(playlist_tracks_pager)
         playlist_tracks.extend(playlist_tracks_pager["items"])
-    return playlist_tracks
+    playlist_track_cache[playlist_id] = playlist_tracks
+    return playlist_track_cache[playlist_id]
 
 
 def clear_playlist(playlist_id):
@@ -252,6 +255,7 @@ def add_new_tracks_to_playlist(genre, tracks_dict):
     print("\n[+] Adding {} new tracks to the playlist: \"{}\"".format(len(daily_top_10_track_ids), daily_top_10_playlist_name))
     add_tracks_to_playlist(playlists[1]["id"], daily_top_10_track_ids)
 
+playlist_track_cache = dict()
 
 # Get authenticated to Spotify on import
 sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, username=username, scope=scope)
