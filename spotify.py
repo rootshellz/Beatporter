@@ -207,7 +207,7 @@ def add_tracks_to_playlist(playlist_id, track_ids):
 
 
 def get_all_tracks_in_playlist(playlist_id):
-    if playlist_track_cache[playlist_id]:
+    if playlist_id in playlist_track_cache:
         return playlist_track_cache[playlist_id]
     playlist_tracks_results = spotify.playlist(playlist_id, fields="tracks")
     playlist_tracks_pager = playlist_tracks_results["tracks"]
