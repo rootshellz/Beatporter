@@ -110,3 +110,9 @@ venv.bak/
 .cache*
 config.py
 token.json
+
+# Package Management
+poetry.lock
+
+# Cron
+cron.fish
