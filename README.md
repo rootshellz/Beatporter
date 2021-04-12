@@ -25,6 +25,12 @@ There is also support for the genre-agnostic, overall, Top 10 and Top 100 charts
 pip install spotipy
 ```
 
+* beautifulsoup4 (tested with 4.9.3)
+
+```
+pip install beautifulsoup4
+```
+
 ## Configuration
 * Copy config.example.py to config.py and update the following values:
     * `username` is your Spotify username
