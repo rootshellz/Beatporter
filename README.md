@@ -61,6 +61,16 @@ To run the application:
  
 ```python3 beatporter.py```
 
+### Get Updated Genres
+
+[Beatport](https://www.beatport.com/) often updates their [genres](https://www.beatport.com/charts) (and the URLs used by Beatporter to retrieve songs from the charts).  To retrieve the current list of genres and links directly from Beatport, run:
+
+```python3 beatporter.py --genres```
+
+This will output a Python dictionary / JSON string object that can be pasted directly into the active configuration file (_config.py_).
+
+Note: Any differences in genre naming will cause a new playlist to be created;  If instead, you would like an existing playlist to adopt the new (or renamed) genre, simply rename the playlist manually in Spotify before running Beatporter with the new genre in the config.  
+
 ## Future Features / ToDo
 This project was born out of a personal desire for this functionality.  I've continued to use and tweak the tool locally for years.  However, I've recently noticed there are at least a couple of other active users out there, so better maintenance and development practices can be followed.  There is a lot that can be done to clean this up if there is continued outside interest.
 
