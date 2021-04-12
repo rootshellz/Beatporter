@@ -11,6 +11,7 @@ spotipy = "^2.17.1"
 beautifulsoup4 = "^4.9.3"
 
 [tool.poetry.dev-dependencies]
+bpython = "^0.21"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
