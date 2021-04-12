@@ -1,11 +1,11 @@
 import json
 import requests
-from bs4 import BeautifulSoup
 
 from config import genres
 
 
 def get_chart_genres():
+    from bs4 import BeautifulSoup
     available_genres = dict()
     r = requests.get("https://www.beatport.com/charts")
     soup = BeautifulSoup(r.text)
@@ -16,6 +16,7 @@ def get_chart_genres():
 
 
 def get_genres():
+    from bs4 import BeautifulSoup
     available_genres = {"All Genres": ""}
     r = requests.get("https://www.beatport.com/")
     soup = BeautifulSoup(r.text, "html.parser")
