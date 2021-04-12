@@ -81,7 +81,8 @@ This project was born out of a personal desire for this functionality.  I've con
     * e.g. Recently implemented a caching fix that significantly decreased overall run time and reduced the number of Spotify API calls by an order of magnitude.
     * Even with the above fix, there is probably room for better timeout and rate-limit handling.
   * Update genres in the example config more often.
-    * It would be cool to get a scraper and automation to do this automagically, but manually every so often would be better than nothing.
+    * Manual updates are now supported using [```python3 beatporter.py --genres```](#get-updated-genres)
+    * It would be cool to have this automatically update the repo in the future.
 * Implement user-configurable playlists
   * Allow toggling of which playlists the user wants to be updated
   * Support Cumulative Top 10 & Daily Top 100 (Currently only Daily Top 10 and Cumulative Top 100 exist)
