@@ -1,7 +1,27 @@
 import json
 import requests
+from bs4 import BeautifulSoup
 
 from config import genres
+
+
+# def get_genres():
+#     available_genres = dict()
+#     r = requests.get("https://www.beatport.com/charts")
+#     soup = BeautifulSoup(r.text)
+#     genre_list_items = soup.find("div", {"class": "bucket genre-list"}).find("ul", {"class": "bucket-items"}).find_all("li")
+#     for genre in genre_list_items:
+#         available_genres[genre.find("a").text] = genre.find("a").get("href")
+#     return available_genres
+
+def get_genres():
+    available_genres = {"All Genres": ""}
+    r = requests.get("https://www.beatport.com/")
+    soup = BeautifulSoup(r.text, "html.parser")
+    genre_links = soup.find("li", {"class": "genre-parent head-parent"}).find_all("a")
+    for genre in genre_links:
+        available_genres[genre.text] = genre.get("href").strip("/genre")
+    return available_genres
 
 
 def get_top_100_playables(genre):
