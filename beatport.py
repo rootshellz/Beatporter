@@ -21,7 +21,7 @@ def get_genres():
     soup = BeautifulSoup(r.text, "html.parser")
     genre_links = soup.find("li", {"class": "genre-parent head-parent"}).find_all("a")
     for genre in genre_links:
-        available_genres[genre.text] = genre.get("href").strip("/genre")
+        available_genres[genre.text] = genre.get("href").replace("/genre", "")
     return available_genres
 
 
