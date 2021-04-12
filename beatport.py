@@ -5,14 +5,15 @@ from bs4 import BeautifulSoup
 from config import genres
 
 
-# def get_genres():
-#     available_genres = dict()
-#     r = requests.get("https://www.beatport.com/charts")
-#     soup = BeautifulSoup(r.text)
-#     genre_list_items = soup.find("div", {"class": "bucket genre-list"}).find("ul", {"class": "bucket-items"}).find_all("li")
-#     for genre in genre_list_items:
-#         available_genres[genre.find("a").text] = genre.find("a").get("href")
-#     return available_genres
+def get_chart_genres():
+    available_genres = dict()
+    r = requests.get("https://www.beatport.com/charts")
+    soup = BeautifulSoup(r.text)
+    genre_list_items = soup.find("div", {"class": "bucket genre-list"}).find("ul", {"class": "bucket-items"}).find_all("li")
+    for genre in genre_list_items:
+        available_genres[genre.find("a").text] = genre.find("a").get("href")
+    return available_genres
+
 
 def get_genres():
     available_genres = {"All Genres": ""}
