@@ -116,3 +116,7 @@ poetry.lock
 
 # Cron
 cron.fish
+
+# VScode
+.vscode/
+
