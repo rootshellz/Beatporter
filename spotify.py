@@ -66,7 +66,7 @@ def do_spotify_oauth():
 
 
 def get_all_playlists():
-    playlists_pager = spotify.user_playlists(username)
+    playlists_pager = spotify.user_playlists(user_id)
     playlists = playlists_pager["items"]
     while playlists_pager["next"]:
         playlists_pager = spotify.next(playlists_pager)
@@ -75,7 +75,7 @@ def get_all_playlists():
 
 
 def create_playlist(playlist_name):
-    playlist = spotify.user_playlist_create(username, playlist_name)
+    playlist = spotify.user_playlist_create(user_id, playlist_name)
     return playlist["id"]
 
 
@@ -122,76 +122,92 @@ def best_of_multiple_matches(source_track, found_tracks):
         return best_track
     # TODO: Popularity does not always yield the correct result
     best_track = most_popular_track(found_tracks)
-    print("\t\t\t[+] Multiple exact matches with matching durations, going with the most popular one: {}".format(best_track))
+    print("\t\t\t[+] Multiple exact matches with matching durations, going with the most popular one: {}".format(
+        best_track))
     return best_track
 
 
 def search_for_track(track):
-    # TODO: This is repetitive, can probably refactor but works for now
-    print("\n[+] Searching for track: {}{}by {} on {}".format(track["name"], " " if not track["mix"] else " ({}) ".format(track["mix"]), ", ".join(track["artists"]), track["release"]))
-    # Search with Title, Mix, Artists, and Release / Album
-    query = "{}{}{} {}".format(track["name"], " " if not track["mix"] else " {} ".format(track["mix"]), " ".join(track["artists"]), track["release"])
-    print("\t[+] Search Query: {}".format(query))
-    search_results = spotify.search(query)
-    if len(search_results["tracks"]["items"]) == 1:
-        track_id = search_results["tracks"]["items"][0]["id"]
-        print("\t\t[+] Found an exact match on name, mix, artists, and release: {}".format(track_id))
-        do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
-        return track_id
+    try:
+        # TODO: This is repetitive, can probably refactor but works for now
+        print("\n[+] Searching for track: {}{}by {} on {}".format(track["name"],
+                                                                  " " if not track["mix"] else " ({}) ".format(
+                                                                      track["mix"]), ", ".join(track["artists"]),
+                                                                  track["release"]))
+        # Search with Title, Mix, Artists, and Release / Album
+        query = "{}{}{} {}".format(track["name"], " " if not track["mix"] else " {} ".format(track["mix"]),
+                                   " ".join(track["artists"]), track["release"])
+        print("\t[+] Search Query: {}".format(query))
 
-    if len(search_results["tracks"]["items"]) > 1:
-        print("\t\t[+] Found multiple exact matches ({}) on name, mix, artists, and release.".format(len(search_results["tracks"]["items"])))
-        return best_of_multiple_matches(track, search_results["tracks"]["items"])
+        search_results = spotify.search(query)
+        if len(search_results["tracks"]["items"]) == 1:
+            track_id = search_results["tracks"]["items"][0]["id"]
+            print("\t\t[+] Found an exact match on name, mix, artists, and release: {}".format(track_id))
+            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            return track_id
 
-    # Not enough results, search w/o release
-    print("\t\t[+] No exact matches on name, mix, artists, and release.  Trying without release.")
-    # Search with Title, Mix, and Artists
-    query = "{}{}{}".format(track["name"], " " if not track["mix"] else " {} ".format(track["mix"]), " ".join(track["artists"]))
-    print("\t[+] Search Query: {}".format(query))
-    search_results = spotify.search(query)
-    if len(search_results["tracks"]["items"]) == 1:
-        track_id = search_results["tracks"]["items"][0]["id"]
-        print("\t\t[+] Found an exact match on name, mix, and artists: {}".format(track_id))
-        do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
-        return track_id
+        if len(search_results["tracks"]["items"]) > 1:
+            print("\t\t[+] Found multiple exact matches ({}) on name, mix, artists, and release.".format(
+                len(search_results["tracks"]["items"])))
+            return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
-    if len(search_results["tracks"]["items"]) > 1:
-        print("\t\t[+] Found multiple exact matches ({}) on name, mix, and artists.".format(len(search_results["tracks"]["items"])))
-        return best_of_multiple_matches(track, search_results["tracks"]["items"])
+        # Not enough results, search w/o release
+        print("\t\t[+] No exact matches on name, mix, artists, and release.  Trying without release.")
+        # Search with Title, Mix, and Artists
+        query = "{}{}{}".format(track["name"], " " if not track["mix"] else " {} ".format(track["mix"]),
+                                " ".join(track["artists"]))
+        print("\t[+] Search Query: {}".format(query))
+        search_results = spotify.search(query)
+        if len(search_results["tracks"]["items"]) == 1:
+            track_id = search_results["tracks"]["items"][0]["id"]
+            print("\t\t[+] Found an exact match on name, mix, and artists: {}".format(track_id))
+            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            return track_id
 
-    # Not enough results, search w/o mix, but with release
-    print("\t\t[+] No exact matches on name, mix, and artists.  Trying without mix, but with release.")
-    query = "{} {} {}".format(track["name"], " ".join(track["artists"]), track["release"])
-    print("\t[+] Search Query: {}".format(query))
-    search_results = spotify.search(query)
-    if len(search_results["tracks"]["items"]) == 1:
-        track_id = search_results["tracks"]["items"][0]["id"]
-        print("\t\t[+] Found an exact match on name, artists, and release: {}".format(track_id))
-        do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
-        return track_id
+        if len(search_results["tracks"]["items"]) > 1:
+            print("\t\t[+] Found multiple exact matches ({}) on name, mix, and artists.".format(
+                len(search_results["tracks"]["items"])))
+            return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
-    if len(search_results["tracks"]["items"]) > 1:
-        print("\t\t[+] Found multiple exact matches ({}) on name, artists, and release.".format(len(search_results["tracks"]["items"])))
-        return best_of_multiple_matches(track, search_results["tracks"]["items"])
+        # Not enough results, search w/o mix, but with release
+        print("\t\t[+] No exact matches on name, mix, and artists.  Trying without mix, but with release.")
+        query = "{} {} {}".format(track["name"], " ".join(track["artists"]), track["release"])
+        print("\t[+] Search Query: {}".format(query))
+        search_results = spotify.search(query)
+        if len(search_results["tracks"]["items"]) == 1:
+            track_id = search_results["tracks"]["items"][0]["id"]
+            print("\t\t[+] Found an exact match on name, artists, and release: {}".format(track_id))
+            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            return track_id
 
-    # Not enough results, search w/o mix or release
-    print("\t\t[+] No exact matches on name, artists, and release.  Trying with just name and artists.")
-    query = "{} {}".format(track["name"], " ".join(track["artists"]))
-    print("\t[+] Search Query: {}".format(query))
-    search_results = spotify.search(query)
-    if len(search_results["tracks"]["items"]) == 1:
-        track_id = search_results["tracks"]["items"][0]["id"]
-        print("\t\t[+] Found an exact match on name and artists: {}".format(track_id))
-        do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
-        return track_id
+        if len(search_results["tracks"]["items"]) > 1:
+            print("\t\t[+] Found multiple exact matches ({}) on name, artists, and release.".format(
+                len(search_results["tracks"]["items"])))
+            return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
-    if len(search_results["tracks"]["items"]) > 1:
-        print("\t\t[+] Found multiple exact matches ({}) on name and artists.".format(len(search_results["tracks"]["items"])))
-        return best_of_multiple_matches(track, search_results["tracks"]["items"])
+        # Not enough results, search w/o mix or release
+        print("\t\t[+] No exact matches on name, artists, and release.  Trying with just name and artists.")
+        query = "{} {}".format(track["name"], " ".join(track["artists"]))
+        print("\t[+] Search Query: {}".format(query))
+        search_results = spotify.search(query)
+        if len(search_results["tracks"]["items"]) == 1:
+            track_id = search_results["tracks"]["items"][0]["id"]
+            print("\t\t[+] Found an exact match on name and artists: {}".format(track_id))
+            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            return track_id
 
-    print("\t\t[+] No exact matches on name and artists.")
-    print("\t[!] Could not find this song on Spotify!")
-    return None
+        if len(search_results["tracks"]["items"]) > 1:
+            print("\t\t[+] Found multiple exact matches ({}) on name and artists.".format(
+                len(search_results["tracks"]["items"])))
+            return best_of_multiple_matches(track, search_results["tracks"]["items"])
+
+        print("\t\t[+] No exact matches on name and artists.")
+        print("\t[!] Could not find this song on Spotify!")
+        return None
+    # TODO: better error handling
+    except:
+        print("Error when searching track")
+        return None
 
 
 def track_in_playlist(playlist_id, track_id):
@@ -203,7 +219,7 @@ def track_in_playlist(playlist_id, track_id):
 
 def add_tracks_to_playlist(playlist_id, track_ids):
     if track_ids:
-        spotify.user_playlist_add_tracks(username, playlist_id, track_ids)
+        spotify.user_playlist_add_tracks(user_id, playlist_id, track_ids)
 
 
 def get_all_tracks_in_playlist(playlist_id):
@@ -221,7 +237,7 @@ def get_all_tracks_in_playlist(playlist_id):
 
 def clear_playlist(playlist_id):
     for track in get_all_tracks_in_playlist(playlist_id):
-        spotify.user_playlist_remove_all_occurrences_of_tracks(username, playlist_id, [track["track"]["id"],])
+        spotify.user_playlist_remove_all_occurrences_of_tracks(user_id, playlist_id, [track["track"]["id"], ])
 
 
 def add_new_tracks_to_playlist(genre, tracks_dict):
