@@ -11,6 +11,16 @@ This tool currently supports toggleable genre settings and creates two playlists
 
 There is also support for the genre-agnostic, overall, Top 10 and Top 100 charts.
 
+## Contributing
+
+Contributions are always welcome. If you would like to contribute to Beatporter, simply fork this repo and then open a pull request when ready.
+
+### Contributors
+
+Thanks to those who have contributed to this project!
+
+- @TimDeanMoser
+
 ## Prerequisites
 
 - Python 3
