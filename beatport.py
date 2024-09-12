@@ -2,6 +2,8 @@ import json
 import re
 import sys
 import requests
+from bs4 import BeautifulSoup
+
 from config import genres
 
 
@@ -19,8 +21,6 @@ def render_page(url):
 
 
 def get_chart_genres():
-    from bs4 import BeautifulSoup
-
     available_genres = dict()
     r = requests.get("https://www.beatport.com/charts")
     soup = BeautifulSoup(r.text)
@@ -35,8 +35,6 @@ def get_chart_genres():
 
 
 def get_genres():
-    from bs4 import BeautifulSoup
-
     available_genres = {"All Genres": ""}
     r = render_page("https://www.beatport.com/")
     soup = BeautifulSoup(r, "html.parser")
@@ -49,8 +47,6 @@ def get_genres():
 
 
 def get_top_100_playables(genre):
-    from bs4 import BeautifulSoup
-
     # Realistic headers to circumvent lockout for too many requests
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
