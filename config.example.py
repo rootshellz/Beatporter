@@ -1,9 +1,7 @@
 # Copy this to config.py and update necessary values
 
-# Spotify Username
+# Spotify Username (as listed on https://www.spotify.com/us/account/profile/)
 username = "CHANGE_ME"
-# http://open.spotify.com/user/{{user_id}}
-user_id = "CHANGE_ME"
 
 # Spotify Authentication Scopes
 scope = "playlist-read-private playlist-modify-private playlist-modify-public"
@@ -48,5 +46,5 @@ genres = {
     "Trance (Main Floor)": "trance-main-floor/7",
     "Trance (Raw / Deep / Hypnotic)": "trance-raw-deep-hypnotic/99",
     "Trap / Wave": "trap-wave/38",
-    "UK Garage / Bassline": "uk-garage-bassline/86"
+    "UK Garage / Bassline": "uk-garage-bassline/86",
 }

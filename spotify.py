@@ -12,7 +12,7 @@ from config import *
 
 def listen_for_callback_code():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('localhost', int(redirect_uri.split(":")[-1])))
+    s.bind(("localhost", int(redirect_uri.split(":")[-1])))
     s.listen(1)
     while True:
         connection, address = s.accept()
@@ -51,7 +51,9 @@ def do_spotify_oauth():
         authorization_code = asyncio.run(async_get_auth_code())
         print(authorization_code)
         if not authorization_code:
-            print("\n[!] Unable to authenticate to Spotify.  Couldn't get authorization code")
+            print(
+                "\n[!] Unable to authenticate to Spotify.  Couldn't get authorization code"
+            )
             sys.exit(-1)
         token = sp_oauth.get_access_token(authorization_code)
     if not token:
@@ -109,7 +111,9 @@ def most_popular_track(tracks):
 
 def best_of_multiple_matches(source_track, found_tracks):
     counter = 1
-    duration_matches = [0, ]
+    duration_matches = [
+        0,
+    ]
     for track in found_tracks:
         print("\t\t\t[+] Match {}: {}".format(counter, track["id"]))
         if do_durations_match(source_track["duration_ms"], track["duration_ms"]):
@@ -118,87 +122,151 @@ def best_of_multiple_matches(source_track, found_tracks):
         counter += 1
     if duration_matches[0] == 1:
         best_track = duration_matches.pop()["id"]
-        print("\t\t\t[+] Only one exact match with matching duration, going with that one: {}".format(best_track))
+        print(
+            "\t\t\t[+] Only one exact match with matching duration, going with that one: {}".format(
+                best_track
+            )
+        )
         return best_track
     # TODO: Popularity does not always yield the correct result
     best_track = most_popular_track(found_tracks)
-    print("\t\t\t[+] Multiple exact matches with matching durations, going with the most popular one: {}".format(
-        best_track))
+    print(
+        "\t\t\t[+] Multiple exact matches with matching durations, going with the most popular one: {}".format(
+            best_track
+        )
+    )
     return best_track
 
 
 def search_for_track(track):
     try:
         # TODO: This is repetitive, can probably refactor but works for now
-        print("\n[+] Searching for track: {}{}by {} on {}".format(track["name"],
-                                                                  " " if not track["mix"] else " ({}) ".format(
-                                                                      track["mix"]), ", ".join(track["artists"]),
-                                                                  track["release"]))
+        print(
+            "\n[+] Searching for track: {}{}by {} on {}".format(
+                track["name"],
+                " " if not track["mix"] else " ({}) ".format(track["mix"]),
+                ", ".join(track["artists"]),
+                track["release"],
+            )
+        )
         # Search with Title, Mix, Artists, and Release / Album
-        query = "{}{}{} {}".format(track["name"], " " if not track["mix"] else " {} ".format(track["mix"]),
-                                   " ".join(track["artists"]), track["release"])
+        query = "{}{}{} {}".format(
+            track["name"],
+            " " if not track["mix"] else " {} ".format(track["mix"]),
+            " ".join(track["artists"]),
+            track["release"],
+        )
         print("\t[+] Search Query: {}".format(query))
 
         search_results = spotify.search(query)
         if len(search_results["tracks"]["items"]) == 1:
             track_id = search_results["tracks"]["items"][0]["id"]
-            print("\t\t[+] Found an exact match on name, mix, artists, and release: {}".format(track_id))
-            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            print(
+                "\t\t[+] Found an exact match on name, mix, artists, and release: {}".format(
+                    track_id
+                )
+            )
+            do_durations_match(
+                track["duration_ms"],
+                search_results["tracks"]["items"][0]["duration_ms"],
+            )
             return track_id
 
         if len(search_results["tracks"]["items"]) > 1:
-            print("\t\t[+] Found multiple exact matches ({}) on name, mix, artists, and release.".format(
-                len(search_results["tracks"]["items"])))
+            print(
+                "\t\t[+] Found multiple exact matches ({}) on name, mix, artists, and release.".format(
+                    len(search_results["tracks"]["items"])
+                )
+            )
             return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
         # Not enough results, search w/o release
-        print("\t\t[+] No exact matches on name, mix, artists, and release.  Trying without release.")
+        print(
+            "\t\t[+] No exact matches on name, mix, artists, and release.  Trying without release."
+        )
         # Search with Title, Mix, and Artists
-        query = "{}{}{}".format(track["name"], " " if not track["mix"] else " {} ".format(track["mix"]),
-                                " ".join(track["artists"]))
+        query = "{}{}{}".format(
+            track["name"],
+            " " if not track["mix"] else " {} ".format(track["mix"]),
+            " ".join(track["artists"]),
+        )
         print("\t[+] Search Query: {}".format(query))
         search_results = spotify.search(query)
         if len(search_results["tracks"]["items"]) == 1:
             track_id = search_results["tracks"]["items"][0]["id"]
-            print("\t\t[+] Found an exact match on name, mix, and artists: {}".format(track_id))
-            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            print(
+                "\t\t[+] Found an exact match on name, mix, and artists: {}".format(
+                    track_id
+                )
+            )
+            do_durations_match(
+                track["duration_ms"],
+                search_results["tracks"]["items"][0]["duration_ms"],
+            )
             return track_id
 
         if len(search_results["tracks"]["items"]) > 1:
-            print("\t\t[+] Found multiple exact matches ({}) on name, mix, and artists.".format(
-                len(search_results["tracks"]["items"])))
+            print(
+                "\t\t[+] Found multiple exact matches ({}) on name, mix, and artists.".format(
+                    len(search_results["tracks"]["items"])
+                )
+            )
             return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
         # Not enough results, search w/o mix, but with release
-        print("\t\t[+] No exact matches on name, mix, and artists.  Trying without mix, but with release.")
-        query = "{} {} {}".format(track["name"], " ".join(track["artists"]), track["release"])
+        print(
+            "\t\t[+] No exact matches on name, mix, and artists.  Trying without mix, but with release."
+        )
+        query = "{} {} {}".format(
+            track["name"], " ".join(track["artists"]), track["release"]
+        )
         print("\t[+] Search Query: {}".format(query))
         search_results = spotify.search(query)
         if len(search_results["tracks"]["items"]) == 1:
             track_id = search_results["tracks"]["items"][0]["id"]
-            print("\t\t[+] Found an exact match on name, artists, and release: {}".format(track_id))
-            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            print(
+                "\t\t[+] Found an exact match on name, artists, and release: {}".format(
+                    track_id
+                )
+            )
+            do_durations_match(
+                track["duration_ms"],
+                search_results["tracks"]["items"][0]["duration_ms"],
+            )
             return track_id
 
         if len(search_results["tracks"]["items"]) > 1:
-            print("\t\t[+] Found multiple exact matches ({}) on name, artists, and release.".format(
-                len(search_results["tracks"]["items"])))
+            print(
+                "\t\t[+] Found multiple exact matches ({}) on name, artists, and release.".format(
+                    len(search_results["tracks"]["items"])
+                )
+            )
             return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
         # Not enough results, search w/o mix or release
-        print("\t\t[+] No exact matches on name, artists, and release.  Trying with just name and artists.")
+        print(
+            "\t\t[+] No exact matches on name, artists, and release.  Trying with just name and artists."
+        )
         query = "{} {}".format(track["name"], " ".join(track["artists"]))
         print("\t[+] Search Query: {}".format(query))
         search_results = spotify.search(query)
         if len(search_results["tracks"]["items"]) == 1:
             track_id = search_results["tracks"]["items"][0]["id"]
-            print("\t\t[+] Found an exact match on name and artists: {}".format(track_id))
-            do_durations_match(track["duration_ms"], search_results["tracks"]["items"][0]["duration_ms"])
+            print(
+                "\t\t[+] Found an exact match on name and artists: {}".format(track_id)
+            )
+            do_durations_match(
+                track["duration_ms"],
+                search_results["tracks"]["items"][0]["duration_ms"],
+            )
             return track_id
 
         if len(search_results["tracks"]["items"]) > 1:
-            print("\t\t[+] Found multiple exact matches ({}) on name and artists.".format(
-                len(search_results["tracks"]["items"])))
+            print(
+                "\t\t[+] Found multiple exact matches ({}) on name and artists.".format(
+                    len(search_results["tracks"]["items"])
+                )
+            )
             return best_of_multiple_matches(track, search_results["tracks"]["items"])
 
         print("\t\t[+] No exact matches on name and artists.")
@@ -237,20 +305,42 @@ def get_all_tracks_in_playlist(playlist_id):
 
 def clear_playlist(playlist_id):
     for track in get_all_tracks_in_playlist(playlist_id):
-        spotify.user_playlist_remove_all_occurrences_of_tracks(user_id, playlist_id, [track["track"]["id"], ])
+        spotify.user_playlist_remove_all_occurrences_of_tracks(
+            user_id,
+            playlist_id,
+            [
+                track["track"]["id"],
+            ],
+        )
 
 
 def add_new_tracks_to_playlist(genre, tracks_dict):
     persistent_top_100_playlist_name = "Beatporter: {} - Top 100".format(genre)
     daily_top_10_playlist_name = "Beatporter: {} - Daily Top 10".format(genre)
-    print("[+] Identifying new tracks for playlist: \"{}\"".format(persistent_top_100_playlist_name))
+    print(
+        '[+] Identifying new tracks for playlist: "{}"'.format(
+            persistent_top_100_playlist_name
+        )
+    )
 
-    playlists = [{"name": persistent_top_100_playlist_name, "id": get_playlist_id(persistent_top_100_playlist_name)},
-                 {"name": daily_top_10_playlist_name, "id": get_playlist_id(daily_top_10_playlist_name)}]
+    playlists = [
+        {
+            "name": persistent_top_100_playlist_name,
+            "id": get_playlist_id(persistent_top_100_playlist_name),
+        },
+        {
+            "name": daily_top_10_playlist_name,
+            "id": get_playlist_id(daily_top_10_playlist_name),
+        },
+    ]
 
     for playlist in playlists:
         if not playlist["id"]:
-            print("\t[!] Playlist \"{}\" does not exist, creating it.".format(playlist["name"]))
+            print(
+                '\t[!] Playlist "{}" does not exist, creating it.'.format(
+                    playlist["name"]
+                )
+            )
             playlist["id"] = create_playlist(playlist["name"])
 
     # Clear daily playlist
@@ -266,14 +356,26 @@ def add_new_tracks_to_playlist(genre, tracks_dict):
         if track_id and track_count < 10:
             daily_top_10_track_ids.append(track_id)
         track_count += 1
-    print("\n[+] Adding {} new tracks to the playlist: \"{}\"".format(len(persistent_top_100_track_ids), persistent_top_100_playlist_name))
+    print(
+        '\n[+] Adding {} new tracks to the playlist: "{}"'.format(
+            len(persistent_top_100_track_ids), persistent_top_100_playlist_name
+        )
+    )
     add_tracks_to_playlist(playlists[0]["id"], persistent_top_100_track_ids)
-    print("\n[+] Adding {} new tracks to the playlist: \"{}\"".format(len(daily_top_10_track_ids), daily_top_10_playlist_name))
+    print(
+        '\n[+] Adding {} new tracks to the playlist: "{}"'.format(
+            len(daily_top_10_track_ids), daily_top_10_playlist_name
+        )
+    )
     add_tracks_to_playlist(playlists[1]["id"], daily_top_10_track_ids)
+
 
 playlist_track_cache = dict()
 
 # Get authenticated to Spotify on import
-sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, username=username, scope=scope)
+sp_oauth = oauth2.SpotifyOAuth(
+    client_id, client_secret, redirect_uri, username=username, scope=scope
+)
 token_info = do_spotify_oauth()
 spotify = spotipy.Spotify(auth=token_info["access_token"], requests_timeout=120)
+user_id = spotify.me().get("id")

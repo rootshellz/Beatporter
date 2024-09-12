@@ -2,6 +2,8 @@ import json
 import re
 import sys
 import requests
+from bs4 import BeautifulSoup
+
 from config import genres
 
 
@@ -9,6 +11,7 @@ from config import genres
 def render_page(url):
     from selenium import webdriver
     import time
+
     driver = webdriver.Chrome()
     driver.get(url)
     time.sleep(3)
@@ -18,43 +21,51 @@ def render_page(url):
 
 
 def get_chart_genres():
-    from bs4 import BeautifulSoup
     available_genres = dict()
     r = requests.get("https://www.beatport.com/charts")
     soup = BeautifulSoup(r.text)
-    genre_list_items = soup.find("div", {"class": "bucket genre-list"}).find("ul", {"class": "bucket-items"}).find_all(
-        "li")
+    genre_list_items = (
+        soup.find("div", {"class": "bucket genre-list"})
+        .find("ul", {"class": "bucket-items"})
+        .find_all("li")
+    )
     for genre in genre_list_items:
         available_genres[genre.find("a").text] = genre.find("a").get("href")
     return available_genres
 
 
 def get_genres():
-    from bs4 import BeautifulSoup
     available_genres = {"All Genres": ""}
     r = render_page("https://www.beatport.com/")
     soup = BeautifulSoup(r, "html.parser")
-    links = soup.find_all('a', {"data-testid": re.compile(r'header-subnav-link-genre\d*')})
+    links = soup.find_all(
+        "a", {"data-testid": re.compile(r"header-subnav-link-genre\d*")}
+    )
     for genre in links:
         available_genres[genre.text] = genre.get("href").replace("/genre/", "")
     return available_genres
 
 
 def get_top_100_playables(genre):
-    from bs4 import BeautifulSoup
     # Realistic headers to circumvent lockout for too many requests
     HEADERS = {
-        'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'}
-    r = requests.get("https://www.beatport.com/{}/{}/top-100".format("genre" if genres[genre] else "", genres[genre]),
-                     headers=HEADERS)
+        "User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+    }
+    r = requests.get(
+        "https://www.beatport.com/{}/{}/top-100".format(
+            "genre" if genres[genre] else "", genres[genre]
+        ),
+        headers=HEADERS,
+    )
     if r.status_code == 403:
         print("Forbidden error:")
         print(r.text)
         sys.exit()
     soup = BeautifulSoup(r.text, "html.parser")
-    next_data = soup.find('script', {"id": "__NEXT_DATA__"})
-    return json.loads(next_data.contents[0])['props']['pageProps']['dehydratedState']['queries'][0]['state']['data'][
-        'results']
+    next_data = soup.find("script", {"id": "__NEXT_DATA__"})
+    return json.loads(next_data.contents[0])["props"]["pageProps"]["dehydratedState"][
+        "queries"
+    ][0]["state"]["data"]["results"]
 
 
 def parse_tracks(tracks_json):
@@ -62,7 +73,11 @@ def parse_tracks(tracks_json):
     for track in tracks_json:
         tracks.append(
             {
-                "title": track["release"]["name"] if track["release"]["name"] else track["name"],
+                "title": (
+                    track["release"]["name"]
+                    if track["release"]["name"]
+                    else track["name"]
+                ),
                 "name": track["name"],
                 "mix": track["mix_name"],
                 "artists": [artist["name"] for artist in track["artists"]],
@@ -73,7 +88,7 @@ def parse_tracks(tracks_json):
                 "duration_ms": track["length_ms"],
                 "genres": track["genre"]["name"],
                 "bpm": track["bpm"],
-                "key": track["key"]["name"]
+                "key": track["key"]["name"],
             }
         )
     return tracks
