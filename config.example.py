@@ -1,9 +1,7 @@
 # Copy this to config.py and update necessary values
 
-# Spotify Username
+# Spotify Username (as listed on https://www.spotify.com/us/account/profile/)
 username = "CHANGE_ME"
-# http://open.spotify.com/user/{{user_id}}
-user_id = "CHANGE_ME"
 
 # Spotify Authentication Scopes
 scope = "playlist-read-private playlist-modify-private playlist-modify-public"

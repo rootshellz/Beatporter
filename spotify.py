@@ -378,3 +378,4 @@ sp_oauth = oauth2.SpotifyOAuth(
 )
 token_info = do_spotify_oauth()
 spotify = spotipy.Spotify(auth=token_info["access_token"], requests_timeout=120)
+user_id = spotify.me().get("id")
