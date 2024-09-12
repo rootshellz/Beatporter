@@ -48,5 +48,5 @@ genres = {
     "Trance (Main Floor)": "trance-main-floor/7",
     "Trance (Raw / Deep / Hypnotic)": "trance-raw-deep-hypnotic/99",
     "Trap / Wave": "trap-wave/38",
-    "UK Garage / Bassline": "uk-garage-bassline/86"
+    "UK Garage / Bassline": "uk-garage-bassline/86",
 }

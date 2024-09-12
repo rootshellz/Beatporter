@@ -9,7 +9,15 @@ from datetime import datetime
 def dump_tracks(tracks):
     i = 1
     for track in tracks:
-        print("{}: {} ({}) - {} ({})".format(i, track["name"], track["mix"], ", ".join(track["artists"]), track["duration"]))
+        print(
+            "{}: {} ({}) - {} ({})".format(
+                i,
+                track["name"],
+                track["mix"],
+                ", ".join(track["artists"]),
+                track["duration"],
+            )
+        )
         i += 1
 
 
@@ -17,7 +25,7 @@ if __name__ == "__main__":
     start_time = datetime.now()
 
     parser = argparse.ArgumentParser(description="Beatporter")
-    parser.add_argument("--genres", action='store_true')
+    parser.add_argument("--genres", action="store_true")
     args = parser.parse_args()
 
     if args.genres:
