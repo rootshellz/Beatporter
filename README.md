@@ -51,8 +51,7 @@ pip install selenium
 ## Configuration
 
 - Copy config.example.py to config.py and update the following values:
-  - `username` is your Spotify username
-  - `user_id` is your Spotify user_id that can be found in your profile's url `http://open.spotify.com/user/{{user_id}}`
+  - `username` is your Spotify username (as listed on [https://www.spotify.com/us/account/profile/](https://www.spotify.com/us/account/profile/))
   - `client_id` and `client_secret` are values provided by Spotify for your registered app (on the [Spotify Developer](https://developer.spotify.com) site under the app dashboard).
   - `redirect_uri` this is the local listener that is used to intercept the Spotify authentication callback.
     - As described above, the `redirect_uri` needs to be registered verbatim on the [Spotify Developer](https://developer.spotify.com) site. Go to the app's dashboard and click _Edit Settings_. Then under _Redirect URIs_ paste the value of `redirect_uri` and click _add_. Finally, scroll to the bottom of the _Edit Settings_ window and click _Save_.
