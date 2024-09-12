@@ -2,6 +2,8 @@
 
 # Spotify Username
 username = "CHANGE_ME"
+# http://open.spotify.com/user/{{user_id}}
+user_id = "CHANGE_ME"
 
 # Spotify Authentication Scopes
 scope = "playlist-read-private playlist-modify-private playlist-modify-public"
@@ -16,6 +18,7 @@ genres = {
     "All Genres": "",
     "140 / Deep Dubstep / Grime": "140-deep-dubstep-grime/95",
     "Afro House": "afro-house/89",
+    "Amapiano": "amapiano/98",
     "Bass / Club": "bass-club/85",
     "Bass House": "bass-house/91",
     "Breaks / Breakbeat / UK Bass": "breaks-breakbeat-uk-bass/9",
@@ -27,7 +30,7 @@ genres = {
     "Electro (Classic / Detroit / Modern)": "electro-classic-detroit-modern/94",
     "Electronica": "electronica/3",
     "Funky House": "funky-house/81",
-    "Hard Dance / Hardcore": "hard-dance-hardcore/8",
+    "Hard Dance / Hardcore / Neo Rave": "hard-dance-hardcore-neo-rave/8",
     "Hard Techno": "hard-techno/2",
     "House": "house/5",
     "Indie Dance": "indie-dance/37",
@@ -42,7 +45,8 @@ genres = {
     "Tech House": "tech-house/11",
     "Techno (Peak Time / Driving)": "techno-peak-time-driving/6",
     "Techno (Raw / Deep / Hypnotic)": "techno-raw-deep-hypnotic/92",
-    "Trance": "trance/7",
+    "Trance (Main Floor)": "trance-main-floor/7",
+    "Trance (Raw / Deep / Hypnotic)": "trance-raw-deep-hypnotic/99",
     "Trap / Wave": "trap-wave/38",
     "UK Garage / Bassline": "uk-garage-bassline/86"
 }
